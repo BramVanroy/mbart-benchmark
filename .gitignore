@@ -1,4 +1,6 @@
 Pipfile*
+local_test/
+train_local.json
 
 # .idea (JetBrains)
 .idea/

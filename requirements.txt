@@ -1,0 +1,7 @@
+accelerate
+evaluate
+psutil
+sacrebleu
+sentencepiece
+torch
+transformers

@@ -1,0 +1,22 @@
+{
+  "model_name_or_path": "facebook/mbart-large-cc25",
+  "output_dir": "output_dir",
+  "num_additional_tokens": 200,
+
+  "do_train": true,
+  "do_eval": false,
+
+  "predict_with_generate": false,
+
+  "input_seq_length": 128,
+  "output_seq_length": 180,
+
+  "per_device_train_batch_size": 4,
+  "per_device_eval_batch_size": 4,
+  "gradient_accumulation_steps": 8,
+  "eval_accumulation_steps": 8,
+
+  "num_train_epochs": 1,
+  "overwrite_output_dir": true,
+  "report_to": "wandb"
+}
