@@ -1,3 +1,4 @@
+import dataclasses
 import logging
 import os
 import sys
@@ -22,22 +23,13 @@ def main():
         # let's parse it to get our arguments.
         model_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
 
-        # Now, allow additional overrides
-        if len(sys.argv) > 2:
-            other_args = iter(sys.argv[2:])
+        other_args = sys.argv[2:]
+        cli_model_args, cli_training_args = parser.parse_args_into_dataclasses(args=other_args, look_for_args_file=False)
+        cli_model_args = {k: v for k, v in dataclasses.asdict(cli_model_args).items() if not k.startswith("_")}
+        cli_training_args = {k: v for k, v in dataclasses.asdict(cli_training_args).items() if not k.startswith("_")}
 
-            try:
-                for arg in other_args:
-                    if not arg.startswith("--"):
-                        raise ValueError
-                    arg = arg[2:]  # remove --
-                    value = next(other_args)
-
-                    for parsed_args in (model_args, training_args):
-                        if hasattr(parsed_args, arg):
-                            setattr(parsed_args, arg, value)
-            except:
-                raise ValueError("If additional arguments are given to the JSON file, they have to be in the format '--argument value'")
+        model_args = dataclasses.replace(model_args, **cli_model_args)
+        training_args = dataclasses.replace(training_args, **cli_training_args)
     else:
         model_args, training_args = parser.parse_args_into_dataclasses()
 
