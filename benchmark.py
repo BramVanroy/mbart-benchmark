@@ -16,10 +16,28 @@ logger = logging.getLogger(__name__)
 
 def main():
     parser = HfArgumentParser((ModelArguments, Seq2SeqTrainingArguments))
-    if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
+
+    if sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
         # let's parse it to get our arguments.
         model_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
+
+        # Now, allow additional overrides
+        if len(sys.argv) > 2:
+            other_args = iter(sys.argv[2:])
+
+            try:
+                for arg in other_args:
+                    if not arg.startswith("--"):
+                        raise ValueError
+                    arg = arg[2:]  # remove --
+                    value = next(other_args)
+
+                    for parsed_args in (model_args, training_args):
+                        if hasattr(parsed_args, arg):
+                            setattr(parsed_args, arg, value)
+            except:
+                raise ValueError("If additional arguments are given to the JSON file, they have to be in the format '--argument value'")
     else:
         model_args, training_args = parser.parse_args_into_dataclasses()
 
@@ -94,7 +112,8 @@ def main():
         trainer.log_metrics("train", metrics)
         trainer.save_metrics("train", metrics)
 
-        make_human_readable(f"{training_args.output_dir}/train_results.json")
+        make_human_readable(f"{training_args.output_dir}/train_results.json",
+                            to_add={"batch_size": trainer._train_batch_size})  # Save batch_size after auto_find
 
     max_length = training_args.generation_max_length
     num_beams = training_args.generation_num_beams
