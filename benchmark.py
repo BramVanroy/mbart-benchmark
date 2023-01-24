@@ -18,12 +18,17 @@ logger = logging.getLogger(__name__)
 def main():
     parser = HfArgumentParser((ModelArguments, Seq2SeqTrainingArguments))
 
-    if sys.argv[1].endswith(".json"):
+    try:
+        config_file = next(iter(s for s in sys.argv if s.endswith(".json")))
+    except StopIteration:
+        config_file = None
+
+    if config_file:
         # If we pass only one argument to the script and it's the path to a json file,
         # let's parse it to get our arguments.
-        model_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
+        model_args, training_args = parser.parse_json_file(json_file=os.path.abspath(config_file))
 
-        other_args = sys.argv[2:]
+        other_args = [arg for arg in sys.argv if not arg.endswith((".json", ".py"))]
         cli_model_args, cli_training_args = parser.parse_args_into_dataclasses(args=other_args, look_for_args_file=False)
         cli_model_args = {k: v for k, v in dataclasses.asdict(cli_model_args).items() if not k.startswith("_")}
         cli_training_args = {k: v for k, v in dataclasses.asdict(cli_training_args).items() if not k.startswith("_")}
