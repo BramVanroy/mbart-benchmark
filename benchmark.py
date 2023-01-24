@@ -29,9 +29,10 @@ def main():
         model_args, training_args = parser.parse_json_file(json_file=os.path.abspath(config_file))
 
         other_args = [arg for arg in sys.argv if not arg.endswith((".json", ".py"))]
+        arg_names = {arg[2:] for arg in other_args if arg.startswith("--")}
         cli_model_args, cli_training_args = parser.parse_args_into_dataclasses(args=other_args, look_for_args_file=False)
-        cli_model_args = {k: v for k, v in dataclasses.asdict(cli_model_args).items() if not k.startswith("_")}
-        cli_training_args = {k: v for k, v in dataclasses.asdict(cli_training_args).items() if not k.startswith("_")}
+        cli_model_args = {k: v for k, v in dataclasses.asdict(cli_model_args).items() if not k.startswith("_") and k in arg_names}
+        cli_training_args = {k: v for k, v in dataclasses.asdict(cli_training_args).items() if not k.startswith("_") and k in arg_names}
 
         model_args = dataclasses.replace(model_args, **cli_model_args)
         training_args = dataclasses.replace(training_args, **cli_training_args)
