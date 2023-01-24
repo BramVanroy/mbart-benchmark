@@ -12,6 +12,6 @@
   "input_seq_length": 512,
   "output_seq_length": 512,
 
-  "per_device_eval_batch_size": ,
+  "per_device_eval_batch_size": 8,
   "eval_samples": 1024
 }
