@@ -112,8 +112,9 @@ def main():
         trainer.log_metrics("train", metrics)
         trainer.save_metrics("train", metrics)
 
-        make_human_readable(f"{training_args.output_dir}/train_results.json",
-                            to_add={"batch_size": trainer._train_batch_size})  # Save batch_size after auto_find
+        if trainer.is_world_process_zero():
+            make_human_readable(f"{training_args.output_dir}/train_results.json",
+                                to_add={"batch_size": trainer._train_batch_size})  # Save batch_size after auto_find
 
     max_length = training_args.generation_max_length
     num_beams = training_args.generation_num_beams
@@ -126,7 +127,8 @@ def main():
         trainer.log_metrics("eval", metrics)
         trainer.save_metrics("eval", metrics)
 
-        make_human_readable(f"{training_args.output_dir}/eval_results.json")
+        if trainer.is_world_process_zero():
+            make_human_readable(f"{training_args.output_dir}/eval_results.json")
 
 
 if __name__ == '__main__':
