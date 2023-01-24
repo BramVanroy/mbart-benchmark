@@ -1,6 +1,7 @@
 import json
 import math
 from pathlib import Path
+from typing import Optional
 
 
 def convert_size(size_bytes: int):
@@ -13,13 +14,16 @@ def convert_size(size_bytes: int):
     return f"{s} {size_name[i]}"
 
 
-def make_human_readable(fname: str):
+def make_human_readable(fname: str, to_add: Optional[dict] = None):
     data = json.loads(Path(fname).read_text(encoding="utf-8"))
 
     for key, value in data.items():
         if "_mem_" in key:
             if isinstance(value, int):
                 data[key] = convert_size(value)
+
+    if to_add:
+        data = {**data, **to_add}
 
     with open(fname, "w", encoding="utf-8") as fhout:
         json.dump(data, fhout, ensure_ascii=False, indent=4)
