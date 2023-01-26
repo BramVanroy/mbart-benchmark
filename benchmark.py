@@ -28,10 +28,9 @@ def main():
     if config_file:
         config_args = parser.parse_json_file(json_file=os.path.abspath(config_file))
 
-        # Find all other CLI arguments but exclude the current config file and the current Python file
-        # We need Path(arg).name because on some systems this is automatically expanded
-        # e.g., from `myscript.py` becomes `.\\myscript.py` in sys.argv. So we explicitly check for the name
-        other_args = [arg for arg in sys.argv if arg != config_file and Path(arg).name != Path(__file__).name]
+        # Find all other CLI arguments, i.e. the ones that follow the config file
+        config_arg_idx = sys.argv.index(config_file)
+        other_args = sys.argv[config_arg_idx+1:]
 
         # Find the argument names on CLI, i.e., those starting with -- (e.g., `output_dir`, or `fp16`)
         # arg[2:] to remove "--"
