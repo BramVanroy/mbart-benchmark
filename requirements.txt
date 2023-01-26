@@ -1,5 +1,6 @@
 accelerate
 evaluate
+openpyxl
 psutil
 sacrebleu
 sentencepiece
